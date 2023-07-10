@@ -1,10 +1,10 @@
 {
   "development": {
-    "username": "",
-    "password": "",
-    "database": "",
-    "host": "",
-    "dialect": ""
+    "username": "root",
+    "password": "mslyqppddww13542!",
+    "database": "blog_backend_server_db",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
   },
   "test": {
     "username": "root",
