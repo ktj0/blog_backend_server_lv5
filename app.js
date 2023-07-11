@@ -3,6 +3,7 @@ const cookiParser = require("cookie-parser");
 
 const usersRouter = require("./routes/users.route");
 const postsRouter = require("./routes/posts.route");
+const commentsRouter = require("./routes/comments.route");
 
 const app = express();
 const port = 3000;
@@ -10,7 +11,7 @@ const port = 3000;
 app.use(express.json());
 app.use(cookiParser());
 
-app.use("/api", [usersRouter, postsRouter]);
+app.use("/api", [usersRouter, postsRouter, commentsRouter]);
 
 app.get("/", (req, res) => {
   res.send("hello");
