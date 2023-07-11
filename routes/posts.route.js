@@ -10,6 +10,12 @@ router.post("/posts", authMiddleware, async (req, res) => {
     const { userId } = res.locals.user;
     const { title, content } = req.body;
 
+    if (!title || !content) {
+      return res
+        .status(412)
+        .json({ errorMessage: "데이터 형식이 올바르지 않습니다." });
+    }
+
     await Post.create({ userId, title, content });
 
     return res.status(200).json({ message: "게시글 작성에 성공하였습니다." });
@@ -70,11 +76,17 @@ router.patch("/posts/:postId", authMiddleware, async (req, res) => {
     const { userId } = res.locals.user;
     const { title, content } = req.body;
 
+    if (!title || !content) {
+      return res
+        .status(412)
+        .json({ errorMessage: "데이터 형식이 올바르지 않습니다." });
+    }
+
     const post = await Post.findOne({ where: { postId } });
 
     if (post.userId !== userId) {
       return res
-        .status(400)
+        .status(403)
         .json({ errorMessage: "게시글 수정 권한이 존재하지 않습니다." });
     }
 
@@ -97,9 +109,13 @@ router.delete("/posts/:postId", authMiddleware, async (req, res) => {
 
     const post = await Post.findOne({ where: { postId } });
 
-    if (post.userId !== userId) {
+    if (!post) {
       return res
-        .status(400)
+        .status(404)
+        .json({ errorMessage: "게시글이 존재하지 않습니다." });
+    } else if (post.userId !== userId) {
+      return res
+        .status(403)
         .json({ errorMessage: "게시글 삭제 권한이 존재하지 않습니다." });
     }
 

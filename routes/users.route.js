@@ -38,7 +38,7 @@ router.post("/signup", async (req, res) => {
 
     if (isExistUser) {
       return res
-        .status(400)
+        .status(412)
         .json({ errorMessage: "이미 존재하는 닉네임입니다." });
     }
 
@@ -59,6 +59,8 @@ router.post("/login", async (req, res) => {
     const { nickname, password } = req.body;
 
     const user = await User.findOne({ where: { nickname, password } });
+
+    console.log(user.userId);
 
     if (!user) {
       return res
