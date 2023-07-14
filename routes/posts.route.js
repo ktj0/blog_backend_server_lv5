@@ -5,9 +5,10 @@ const { Post, User } = require('../models');
 
 const router = express.Router();
 
+//게시글 작성
 router.post('/posts', authMiddleware, async (req, res) => {
   try {
-    const { userId } = res.locals.user;
+    const userId = req.user;
     const { title, content } = req.body;
 
     if (!title || !content) {
@@ -28,10 +29,11 @@ router.post('/posts', authMiddleware, async (req, res) => {
   }
 });
 
+//게시글 전체 조회
 router.get('/posts', async (req, res) => {
   try {
     const posts = await Post.findAll({
-      attributes: ['postId', 'userId', 'title', 'createdAt', 'updatedAt'],
+      attributes: ['id', 'userId', 'title', 'likes', 'createdAt', 'updatedAt'],
       include: [
         {
           model: User,
@@ -52,12 +54,20 @@ router.get('/posts', async (req, res) => {
   }
 });
 
+//게시글 상세 조회
 router.get('/posts/:postId', async (req, res) => {
   try {
     const { postId } = req.params;
 
     const post = await Post.findOne({
-      where: { postId },
+      where: { id: postId },
+      include: [
+        {
+          model: User,
+          as: 'user',
+          attributes: ['nickname'],
+        },
+      ],
     });
 
     return res.status(200).json(post);
@@ -70,10 +80,11 @@ router.get('/posts/:postId', async (req, res) => {
   }
 });
 
+//게시글 수정
 router.patch('/posts/:postId', authMiddleware, async (req, res) => {
   try {
     const { postId } = req.params;
-    const { userId } = res.locals.user;
+    const userId = req.user;
     const { title, content } = req.body;
 
     if (!title || !content) {
@@ -82,7 +93,7 @@ router.patch('/posts/:postId', authMiddleware, async (req, res) => {
         .json({ errorMessage: '데이터 형식이 올바르지 않습니다.' });
     }
 
-    const post = await Post.findOne({ where: { postId } });
+    const post = await Post.findOne({ where: { id: postId } });
 
     if (post.userId !== userId) {
       return res
@@ -90,7 +101,7 @@ router.patch('/posts/:postId', authMiddleware, async (req, res) => {
         .json({ errorMessage: '게시글 수정 권한이 존재하지 않습니다.' });
     }
 
-    await Post.update({ title, content }, { where: { postId } });
+    await Post.update({ title, content }, { where: { id: postId } });
 
     return res.status(200).json({ message: '게시글을 수정하였습니다.' });
   } catch (error) {
@@ -102,12 +113,13 @@ router.patch('/posts/:postId', authMiddleware, async (req, res) => {
   }
 });
 
+//게시글 삭제
 router.delete('/posts/:postId', authMiddleware, async (req, res) => {
   try {
     const { postId } = req.params;
-    const { userId } = res.locals.user;
+    const userId = req.user;
 
-    const post = await Post.findOne({ where: { postId } });
+    const post = await Post.findOne({ where: { id: postId } });
 
     if (!post) {
       return res
@@ -120,7 +132,7 @@ router.delete('/posts/:postId', authMiddleware, async (req, res) => {
     }
 
     await Post.destroy({
-      where: { postId },
+      where: { id: postId },
     });
 
     return res.status(200).json({ message: '게시글을 삭제하였습니다.' });

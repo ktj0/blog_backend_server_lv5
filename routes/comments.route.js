@@ -5,10 +5,11 @@ const authMiddleware = require('../middlewares/auth-middleware');
 
 const router = express.Router();
 
+//댓글 작성
 router.post('/posts/:postId/comments', authMiddleware, async (req, res) => {
   try {
     const { postId } = req.params;
-    const { userId } = res.locals.user;
+    const userId = req.user;
     const { comment } = req.body;
 
     if (!comment) {
@@ -17,7 +18,7 @@ router.post('/posts/:postId/comments', authMiddleware, async (req, res) => {
       });
     }
 
-    const post = await Post.findOne({ where: { postId } });
+    const post = await Post.findOne({ where: { id: postId } });
 
     if (!post) {
       return res.status(404).json({
@@ -37,11 +38,12 @@ router.post('/posts/:postId/comments', authMiddleware, async (req, res) => {
   }
 });
 
+//댓글 조회
 router.get('/posts/:postId/comments', async (req, res) => {
   try {
     const { postId } = req.params;
 
-    const post = await Post.findOne({ where: { postId } });
+    const post = await Post.findOne({ where: { id: postId } });
 
     if (!post) {
       return res.status(404).json({
@@ -50,7 +52,7 @@ router.get('/posts/:postId/comments', async (req, res) => {
     }
 
     const comments = await Comment.findAll({
-      attributes: ['commentId', 'userId', 'comment', 'createdAt', 'updatedAt'],
+      attributes: ['id', 'userId', 'comment', 'createdAt', 'updatedAt'],
       include: [
         {
           model: User,
@@ -72,13 +74,14 @@ router.get('/posts/:postId/comments', async (req, res) => {
   }
 });
 
+//댓글 수정
 router.patch(
   '/posts/:postId/comments/:commentId',
   authMiddleware,
   async (req, res) => {
     try {
       const { postId, commentId } = req.params;
-      const { userId } = res.locals.user;
+      const userId = req.user;
       const { comment } = req.body;
 
       if (!comment) {
@@ -87,9 +90,9 @@ router.patch(
         });
       }
 
-      const post = await Post.findOne({ where: { postId } });
+      const post = await Post.findOne({ where: { id: postId } });
       const commentDb = await Comment.findOne({
-        where: { commentId, postId },
+        where: { id: commentId, postId },
       });
 
       if (!post) {
@@ -106,7 +109,7 @@ router.patch(
         });
       }
 
-      await Comment.update({ comment }, { where: { commentId } });
+      await Comment.update({ comment }, { where: { id: commentId } });
 
       return res.status(200).json({ message: '댓글을 수정하였습니다.' });
     } catch (error) {
@@ -119,16 +122,19 @@ router.patch(
   }
 );
 
+//댓글 삭제
 router.delete(
   '/posts/:postId/comments/:commentId',
   authMiddleware,
   async (req, res) => {
     try {
       const { postId, commentId } = req.params;
-      const { userId } = res.locals.user;
+      const userId = req.user;
 
-      const post = await Post.findOne({ where: { postId } });
-      const comment = await Comment.findOne({ where: { postId, commentId } });
+      const post = await Post.findOne({ where: { id: postId } });
+      const comment = await Comment.findOne({
+        where: { id: commentId, postId },
+      });
 
       if (!post) {
         return res
@@ -144,17 +150,15 @@ router.delete(
           .json({ errormMessage: '댓글의 삭제 권한이 존재하지 않습니다.' });
       }
 
-      await Comment.destroy({ where: { commentId } });
+      await Comment.destroy({ where: { id: commentId } });
 
       return res.status(200).json({ message: '댓글을 삭제하였습니다.' });
     } catch (error) {
       console.error(error);
 
-      return res
-        .status(400)
-        .json({
-          errormMessage: '예기치 못한 오류로 댓글 삭제에 실패하였습니다.',
-        });
+      return res.status(400).json({
+        errormMessage: '예기치 못한 오류로 댓글 삭제에 실패하였습니다.',
+      });
     }
   }
 );

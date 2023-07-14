@@ -6,6 +6,7 @@ const { secretKey } = require('../config/secret_key.json');
 
 const router = express.Router();
 
+//회원가입
 router.post('/signup', async (req, res) => {
   try {
     const pattern = /^[a-zA-Z0-9]+$/;
@@ -54,6 +55,7 @@ router.post('/signup', async (req, res) => {
   }
 });
 
+//로그인
 router.post('/login', async (req, res) => {
   try {
     const { nickname, password } = req.body;
@@ -66,7 +68,7 @@ router.post('/login', async (req, res) => {
         .json({ errorMessage: '닉네임 또는 비밀번호를 확인해주세요' });
     }
 
-    const token = jwt.sign({ userId: user.userId }, secretKey);
+    const token = jwt.sign({ userId: user.id }, secretKey);
 
     res.cookie('authorization', `Bearer ${token}`);
 
