@@ -1,4 +1,4 @@
-const { Post, User } = require('../models');
+import {Post, User} from '../models';
 
 class PostRepository {
   //게시글 생성
@@ -59,4 +59,4 @@ class PostRepository {
   };
 }
 
-module.exports = PostRepository;
+export default PostRepository;

@@ -1,9 +1,9 @@
-const express = require('express');
-const router = express.Router();
+import express from 'express';
+import router from express.Router();
 
-const authMiddleware = require('../middlewares/auth-middleware');
+import authMiddleware from '../middlewares/auth-middleware.js';
 
-const PostController = require('../controllers/posts.controller');
+import PostController from '../controllers/posts.controller.js';
 const postController = new PostController();
 
 //게시글 작성
@@ -21,4 +21,4 @@ router.patch('/posts/:postId', authMiddleware, postController.updatePost);
 // //게시글 삭제
 router.delete('/posts/:postId', authMiddleware, postController.deletePost);
 
-module.exports = router;
+export default router;

@@ -1,4 +1,4 @@
-const PostRepository = require('../repositories/posts.repository');
+import PostRepository from '../repositories/posts.repository.js';
 
 class PostService {
   postRepository = new PostRepository();
@@ -39,4 +39,4 @@ class PostService {
   };
 }
 
-module.exports = PostService;
+export default PostService;

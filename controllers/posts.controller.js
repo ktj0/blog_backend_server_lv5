@@ -1,4 +1,4 @@
-const PostService = require('../services/posts.service');
+import PostService from '../services/posts.service.js';
 
 class PostController {
   postService = new PostService();
@@ -127,4 +127,4 @@ class PostController {
   };
 }
 
-module.exports = PostController;
+export default PostController;

@@ -1,10 +1,8 @@
-const jwt = require('jsonwebtoken');
-
-const { User } = require('../models');
-const { secretKey } = require('../config/secret_key.json');
+import jwt from 'jsonwebtoken';
+import {secretKey} from '../../config/secret_key.json';
 
 //사용자 인증 미들웨어
-module.exports = async (req, res, next) => {
+const authMiddleware = async (req, res, next) => {
   try {
     const { authorization } = req.cookies;
 
@@ -38,3 +36,5 @@ module.exports = async (req, res, next) => {
       .json({ errorMessage: '전달된 쿠키에서 오류가 발생하였습니다.' });
   }
 };
+
+export default authMiddleware;
